@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsch Lernen — German Learning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root { --black:#1a1a1a; --red:#cc0000; --gold:#FFCE00; --bg:#f2f2f2; --text:#2c2c2c; --muted:#777; --shadow:0 6px 24px rgba(0,0,0,0.1); }
+        body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+        header { background:var(--black); border-bottom:4px solid var(--red); }
+        .header-inner { max-width:860px; margin:0 auto; padding:18px 24px; display:flex; align-items:center; justify-content:space-between; }
+        .logo { display:flex; align-items:center; gap:12px; }
+        .flag-bar { display:flex; flex-direction:column; width:26px; height:18px; border-radius:3px; overflow:hidden; }
+        .flag-bar span { flex:1; }
+        .flag-bar span:nth-child(1){background:#000;} .flag-bar span:nth-child(2){background:#CC0000;} .flag-bar span:nth-child(3){background:#FFCE00;}
+        h1 { font-size:1.35rem; font-weight:800; color:white; letter-spacing:-0.5px; }
+        h1 em { color:var(--gold); font-style:normal; }
+        nav { display:flex; gap:6px; }
+        nav a { color:#999; text-decoration:none; padding:7px 16px; border-radius:8px; font-size:.85rem; font-weight:600; transition:all .2s; }
+        nav a:hover, nav a.active { background:rgba(255,255,255,.12); color:white; }
+        main { max-width:860px; margin:0 auto; padding:32px 24px; }
+        .page { display:none; } .page.active { display:block; }
+        .section-label { font-size:.7rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+        .set-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+        .set-btn { padding:8px 20px; border:2px solid #ddd; background:white; border-radius:24px; cursor:pointer; font-size:.85rem; font-weight:700; color:var(--text); transition:all .2s; }
+        .set-btn:hover { border-color:var(--red); color:var(--red); }
+        .set-btn.active { background:var(--red); border-color:var(--red); color:white; }
+        .progress-row { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+        .progress-bar { flex:1; height:5px; background:#ddd; border-radius:3px; overflow:hidden; }
+        .progress-fill { height:100%; background:var(--red); border-radius:3px; transition:width .35s ease; }
+        .progress-label { font-size:.82rem; font-weight:700; color:var(--muted); white-space:nowrap; }
+        .card-stage { display:flex; flex-direction:column; align-items:center; gap:20px; }
+        .card-wrapper { perspective:1200px; width:100%; max-width:580px; height:310px; }
+        .card { position:relative; width:100%; height:100%; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,0,.2,1); cursor:pointer; }
+        .card.flipped { transform:rotateY(180deg); }
+        .card-face { position:absolute; inset:0; background:white; border-radius:22px; box-shadow:var(--shadow); backface-visibility:hidden; -webkit-backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:30px 36px; text-align:center; }
+        .card-back-face { transform:rotateY(180deg); }
+        .face-tag { font-size:.65rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+        .german-word { font-size:3.2rem; font-weight:900; color:var(--black); line-height:1; margin-bottom:8px; }
+        .phonetic { font-size:1rem; color:var(--muted); font-style:italic; margin-bottom:22px; letter-spacing:.5px; }
+        .sound-btn { display:inline-flex; align-items:center; gap:7px; padding:10px 24px; background:var(--black); color:white; border:none; border-radius:28px; cursor:pointer; font-size:.88rem; font-weight:700; transition:all .2s; }
+        .sound-btn:hover { background:var(--red); transform:scale(1.04); }
+        .sound-btn:active { transform:scale(.97); }
+        .sound-btn.playing { background:#005a9e; }
+        .flip-hint { position:absolute; bottom:14px; font-size:.72rem; color:#ccc; }
+        .english-word { font-size:2.1rem; font-weight:800; color:var(--red); margin-bottom:14px; line-height:1.2; }
+        .example-de { font-size:1rem; font-style:italic; color:var(--text); margin-bottom:5px; line-height:1.5; }
+        .example-en { font-size:.84rem; color:var(--muted); }
+        .nav-row { display:flex; align-items:center; gap:14px; }
+        .nav-btn { width:46px; height:46px; border-radius:50%; border:2px solid #ddd; background:white; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center; transition:all .2s; color:var(--text); }
+        .nav-btn:hover:not(:disabled) { border-color:var(--red); color:var(--red); }
+        .nav-btn:disabled { opacity:.28; cursor:not-allowed; }
+        .quiz-launch-btn { padding:12px 30px; background:var(--red); color:white; border:none; border-radius:28px; cursor:pointer; font-size:.95rem; font-weight:800; transition:all .2s; }
+        .quiz-launch-btn:hover { background:#aa0000; transform:scale(1.03); }
+        .quiz-wrap { margin-top:52px; display:none; } .quiz-wrap.open { display:block; }
+        .quiz-head { background:var(--black); color:white; border-radius:18px 18px 0 0; padding:18px 26px; display:flex; align-items:center; justify-content:space-between; }
+        .quiz-head-title { font-size:1rem; font-weight:700; }
+        .quiz-live-score { font-size:.88rem; color:var(--gold); font-weight:700; }
+        .quiz-body { background:white; border-radius:0 0 18px 18px; padding:28px; box-shadow:var(--shadow); }
+        .q-block { margin-bottom:28px; padding-bottom:28px; border-bottom:1px solid #f0f0f0; }
+        .q-block:last-of-type { border-bottom:none; margin-bottom:0; }
+        .q-tag { display:inline-block; padding:2px 10px; border-radius:12px; font-size:.68rem; font-weight:800; letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
+        .q-tag.meaning { background:#fff3cd; color:#7d5a00; } .q-tag.sentence { background:#d1ecf1; color:#0c5460; }
+        .q-text { font-size:1.02rem; font-weight:600; margin-bottom:12px; line-height:1.45; }
+        .q-hint { font-size:.78rem; color:#aaa; font-style:italic; margin-bottom:10px; }
+        .options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .opt { padding:10px 15px; border:2px solid #e0e0e0; background:white; border-radius:10px; cursor:pointer; text-align:left; font-size:.88rem; font-weight:500; transition:all .2s; color:var(--text); }
+        .opt:hover:not([disabled]) { border-color:#888; background:#fafafa; }
+        .opt.correct { border-color:#28a745!important; background:#d4edda!important; color:#155724!important; font-weight:700; }
+        .opt.wrong   { border-color:#dc3545!important; background:#f8d7da!important; color:#721c24!important; font-weight:700; }
+        .results-panel { display:none; text-align:center; padding:12px 0 4px; } .results-panel.show { display:block; }
+        .score-ring { width:96px; height:96px; border-radius:50%; background:var(--black); color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto 16px; }
+        .ring-pct { font-size:1.9rem; font-weight:900; line-height:1; }
+        .ring-lbl { font-size:.6rem; color:var(--gold); text-transform:uppercase; letter-spacing:1px; }
+        .result-msg { font-size:1.2rem; font-weight:800; margin-bottom:6px; }
+        .result-sub { color:var(--muted); font-size:.9rem; margin-bottom:22px; }
+        .retry-btn { padding:11px 28px; background:var(--red); color:white; border:none; border-radius:28px; cursor:pointer; font-size:.9rem; font-weight:700; }
+        .retry-btn:hover { background:#aa0000; }
+        .resources-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; }
+        .res-card { background:white; border-radius:18px; padding:24px; box-shadow:var(--shadow); border-top:4px solid var(--red); }
+        .res-icon { font-size:2rem; margin-bottom:10px; }
+        .res-type { font-size:.68rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
+        .res-title { font-size:1.05rem; font-weight:800; margin-bottom:8px; }
+        .res-desc { font-size:.84rem; color:var(--muted); line-height:1.55; margin-bottom:14px; }
+        .res-link { display:inline-block; padding:7px 18px; background:var(--black); color:white; text-decoration:none; border-radius:18px; font-size:.8rem; font-weight:700; transition:background .2s; }
+        .res-link:hover { background:var(--red); }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <div class="logo">
+            <div class="flag-bar"><span></span><span></span><span></span></div>
+            <h1>Deutsch <em>Lernen</em></h1>
+        </div>
+        <nav>
+            <a href="#" class="active" onclick="showPage('flashcards',this);return false">Flashcards</a>
+            <a href="#" onclick="showPage('resources',this);return false">Resources</a>
+        </nav>
+    </div>
+</header>
+<main>
+    <div id="page-flashcards" class="page active">
+        <div class="section-label">Choose a Word Set</div>
+        <div class="set-row" id="setRow"></div>
+        <div class="progress-row">
+            <div class="progress-bar"><div class="progress-fill" id="progFill"></div></div>
+            <div class="progress-label" id="progLabel">1 / 100</div>
+        </div>
+        <div class="card-stage">
+            <div class="card-wrapper">
+                <div class="card" id="theCard" onclick="flipCard()">
+                    <div class="card-face">
+                        <div class="face-tag">German Word</div>
+                        <div class="german-word" id="cWord"></div>
+                        <div class="phonetic" id="cPhonetic"></div>
+                        <button class="sound-btn" id="soundBtn" onclick="playSound(event)">&#128266; Hear it</button>
+                        <div class="flip-hint">Click card to reveal meaning &rarr;</div>
+                    </div>
+                    <div class="card-face card-back-face">
+                        <div class="face-tag">Meaning &amp; Usage</div>
+                        <div class="english-word" id="cMeaning"></div>
+                        <div class="example-de" id="cSentence"></div>
+                        <div class="example-en" id="cTranslation"></div>
+                        <div class="flip-hint">&larr; Click to flip back</div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-row">
+                <button class="nav-btn" id="prevBtn" onclick="prevCard()" disabled>&larr;</button>
+                <button class="quiz-launch-btn" onclick="startQuiz()">Take Quiz</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextCard()">&rarr;</button>
+            </div>
+        </div>
+        <div class="quiz-wrap" id="quizWrap">
+            <div class="quiz-head">
+                <div class="quiz-head-title" id="quizHeadTitle">Quiz</div>
+                <div class="quiz-live-score" id="liveScore">0 / 10</div>
+            </div>
+            <div class="quiz-body">
+                <div id="qContainer"></div>
+                <div class="results-panel" id="resultsPanel">
+                    <div class="score-ring"><div class="ring-pct" id="ringPct">0%</div><div class="ring-lbl">Score</div></div>
+                    <div class="result-msg" id="resultMsg"></div>
+                    <div class="result-sub" id="resultSub"></div>
+                    <button class="retry-btn" onclick="startQuiz()">Try Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="page-resources" class="page">
+        <div class="section-label" style="margin-bottom:20px">Your Learning Resources</div>
+        <div class="resources-grid">
+            <div class="res-card"><div class="res-icon">&#128218;</div><div class="res-type">Audiobook + Text</div><div class="res-title">Der Struwwelpeter</div><div class="res-desc">Classic German children's stories. Short, clear narration — read the text while listening. Perfect for Stage 1 beginners.</div><a class="res-link" href="https://librivox.org" target="_blank">LibriVox (free)</a></div>
+            <div class="res-card"><div class="res-icon">&#127916;</div><div class="res-type">YouTube Channel</div><div class="res-title">Easy German</div><div class="res-desc">Street interviews with real Germans. Dual German + English subtitles. Hear natural spoken German from day one.</div><a class="res-link" href="https://www.youtube.com/@EasyGerman" target="_blank">Watch on YouTube</a></div>
+            <div class="res-card"><div class="res-icon">&#127909;</div><div class="res-type">Film</div><div class="res-title">Das Leben der Anderen</div><div class="res-desc">The Lives of Others (2006). Oscar-winning drama. Clear dialogue, no heavy slang. Watch with German subtitles.</div><div class="res-desc" style="margin-top:4px;font-size:.78rem">Netflix &middot; Amazon Prime</div></div>
+            <div class="res-card"><div class="res-icon">&#128214;</div><div class="res-type">Free Audio + Lessons</div><div class="res-title">Deutsche Welle</div><div class="res-desc">Structured lessons with audio and transcripts. Free, A1 to B2. The best free structured German resource online.</div><a class="res-link" href="https://learngerman.dw.com" target="_blank">Start learning</a></div>
+        </div>
+    </div>
+</main>
+<script src="words.js"></script>
+<script src="words2.js"></script>
+<script src="words3.js"></script>
+<script>
+let currentSet=Object.keys(SETS)[0],cardIndex=0,isFlipped=false,quizQs=[],quizAnswers={},answeredCnt=0;
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');if(el)el.classList.add('active');}
+function buildSetRow(){const row=document.getElementById('setRow');row.innerHTML='';Object.keys(SETS).forEach(name=>{const b=document.createElement('button');b.className='set-btn'+(name===currentSet?' active':'');b.textContent=name;b.onclick=()=>switchSet(name);row.appendChild(b);});}
+function switchSet(name){currentSet=name;cardIndex=0;isFlipped=false;document.querySelectorAll('.set-btn').forEach(b=>b.classList.toggle('active',b.textContent===name));document.getElementById('quizWrap').classList.remove('open');renderCard();}
+function renderCard(){const words=SETS[currentSet],w=words[cardIndex];document.getElementById('theCard').classList.remove('flipped');isFlipped=false;document.getElementById('cWord').textContent=w.de;document.getElementById('cPhonetic').textContent=w.ph;document.getElementById('cMeaning').textContent=w.en;document.getElementById('cSentence').textContent='"'+w.s+'"';document.getElementById('cTranslation').textContent=w.t;const pct=((cardIndex+1)/words.length)*100;document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=(cardIndex+1)+' / '+words.length;document.getElementById('prevBtn').disabled=cardIndex===0;document.getElementById('nextBtn').disabled=cardIndex===words.length-1;}
+function flipCard(){isFlipped=!isFlipped;document.getElementById('theCard').classList.toggle('flipped',isFlipped);}
+function prevCard(){if(cardIndex>0){cardIndex--;renderCard();}}
+function nextCard(){if(cardIndex<SETS[currentSet].length-1){cardIndex++;renderCard();}}
+function playSound(e){e.stopPropagation();const w=SETS[currentSet][cardIndex];const utt=new SpeechSynthesisUtterance(w.de);utt.lang='de-DE';utt.rate=0.78;utt.pitch=1;const btn=document.getElementById('soundBtn');btn.classList.add('playing');utt.onend=()=>btn.classList.remove('playing');window.speechSynthesis.cancel();window.speechSynthesis.speak(utt);}
+function shuffle(arr){return[...arr].sort(()=>Math.random()-.5);}
+function buildQuiz(){const words=SETS[currentSet],pool=shuffle(words).slice(0,10);quizQs=[];pool.forEach((w,i)=>{const others=words.filter(x=>x.de!==w.de);if(i%2===0){const opts=shuffle([...shuffle(others).slice(0,3).map(x=>x.en),w.en]);quizQs.push({type:'meaning',q:'What does "'+w.de+'" mean?',correct:w.en,opts});}else{const blank=w.s.replace(new RegExp(w.de.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i'),'______');const opts=shuffle([...shuffle(others).slice(0,3).map(x=>x.de),w.de]);quizQs.push({type:'sentence',q:'Fill in the blank:',blank,hint:w.t,correct:w.de,opts});}});}
+function startQuiz(){buildQuiz();quizAnswers={};answeredCnt=0;document.getElementById('quizHeadTitle').textContent='Quiz — '+currentSet;document.getElementById('liveScore').textContent='0 / '+quizQs.length;document.getElementById('resultsPanel').classList.remove('show');const container=document.getElementById('qContainer');container.innerHTML='';quizQs.forEach((q,i)=>{const block=document.createElement('div');block.className='q-block';const tag=document.createElement('div');tag.className='q-tag '+q.type;tag.textContent=q.type==='meaning'?'Meaning':'Sentence';const qText=document.createElement('div');qText.className='q-text';if(q.type==='sentence'){qText.textContent=(i+1)+'. '+q.blank;const hint=document.createElement('div');hint.className='q-hint';hint.textContent='('+q.hint+')';block.appendChild(tag);block.appendChild(qText);block.appendChild(hint);}else{qText.textContent=(i+1)+'. '+q.q;block.appendChild(tag);block.appendChild(qText);}const grid=document.createElement('div');grid.className='options';q.opts.forEach(opt=>{const btn=document.createElement('button');btn.className='opt';btn.textContent=opt;btn.onclick=()=>pick(i,opt,btn,grid);grid.appendChild(btn);});block.appendChild(grid);container.appendChild(block);});document.getElementById('quizWrap').classList.add('open');document.getElementById('quizWrap').scrollIntoView({behavior:'smooth',block:'start'});}
+function pick(qi,selected,btn,grid){if(quizAnswers[qi]!==undefined)return;quizAnswers[qi]=selected;grid.querySelectorAll('.opt').forEach(b=>{b.setAttribute('disabled',true);if(b.textContent===quizQs[qi].correct)b.classList.add('correct');});if(selected!==quizQs[qi].correct)btn.classList.add('wrong');answeredCnt++;const correct=Object.entries(quizAnswers).filter(([k,v])=>quizQs[+k].correct===v).length;document.getElementById('liveScore').textContent=correct+' / '+quizQs.length;if(answeredCnt===quizQs.length)setTimeout(()=>showResults(correct),500);}
+function showResults(correct){const total=quizQs.length,pct=Math.round((correct/total)*100);document.getElementById('ringPct').textContent=pct+'%';document.getElementById('resultSub').textContent='You got '+correct+' out of '+total+' correct.';const msgs=['Ueben macht den Meister! Keep practising.','Gut gemacht! Keep going!','Sehr gut! Very good!','Ausgezeichnet! Perfect!'];document.getElementById('resultMsg').textContent=pct===100?msgs[3]:pct>=80?msgs[2]:pct>=60?msgs[1]:msgs[0];document.getElementById('resultsPanel').classList.add('show');}
+document.addEventListener('keydown',e=>{if(document.getElementById('page-flashcards').classList.contains('active')){if(e.key==='ArrowRight')nextCard();if(e.key==='ArrowLeft')prevCard();if(e.key===' '){e.preventDefault();flipCard();}}});
+buildSetRow();renderCard();
+</script>
+</body>
+</html>
